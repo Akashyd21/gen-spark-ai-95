@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GenSpark AI - E-Commerce Product Description Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #FF6B35;
+      --primary-dark: #E55100;
+      --secondary: #004E89;
+      --accent: #00D9FF;
+      --success: #1ABC9C;
+      --danger: #E74C3C;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --text: #2c3e50;
+      --border: #ecf0f1;
+      --gradient-1: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+      --gradient-2: linear-gradient(135deg, #004E89 0%, #0066CC 100%);
+      --gradient-3: linear-gradient(135deg, #1ABC9C 0%, #00D9FF 100%);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ===== Header ===== */
+    header {
+      background: var(--gradient-2);
+      color: white;
+      padding: 2rem 0;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 10px rgba(0, 217, 255, 0.5); }
+      50% { text-shadow: 0 0 20px rgba(0, 217, 255, 0.8); }
+    }
+
+    .header-info {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ===== Main Container ===== */
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    /* ===== Hero Section ===== */
+    .hero {
+      background: var(--gradient-1);
+      color: white;
+      padding: 3rem 2rem;
+      border-radius: 15px;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(20px) translateX(20px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      opacity: 0.95;
+      margin-bottom: 1rem;
+    }
+
+    .hero-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .feature-item {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 1rem;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* ===== Main Form Section ===== */
+    .form-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: var(--shadow-md);
+      border-left: 4px solid var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--secondary);
+      font-size: 0.95rem;
+    }
+
+    .required::after {
+      content: ' *';
+      color: var(--danger);
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+      transform: translateY(-2px);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1.5em;
+      padding-right: 2.5rem;
+    }
+
+    /* ===== Image Upload ===== */
+    .image-upload-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: var(--shadow-md);
+      border-left: 4px solid var(--secondary);
+    }
+
+    .upload-area {
+      border: 2px dashed var(--primary);
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(0, 217, 255, 0.05) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .upload-area:hover {
+      border-color: var(--secondary);
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(0, 217, 255, 0.1) 100%);
+      transform: translateY(-2px);
+    }
+
+    .upload-area.dragover {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(26, 188, 156, 0.15) 100%);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+    }
+
+    #imageInput {
+      display: none;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .upload-text {
+      margin: 1rem 0 0.5rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .upload-hint {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+    }
+
+    #imagePreview {
+      margin-top: 1rem;
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+
+    .image-info {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #ecf0f1;
+      border-radius: 8px;
+      display: none;
+    }
+
+    /* ===== Buttons ===== */
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    button {
+      padding: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--gradient-1);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(255, 107, 53, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--gradient-3);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(26, 188, 156, 0.3);
+    }
+
+    .btn-clear {
+      background: #ecf0f1;
+      color: var(--text);
+    }
+
+    .btn-clear:hover:not(:disabled) {
+      background: #bdc3c7;
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===== Output Section ===== */
+    .output-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--success);
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .output-icon {
+      font-size: 2rem;
+    }
+
+    .output-header h2 {
+      color: var(--secondary);
+      margin: 0;
+    }
+
+    #outputContent {
+      background: linear-gradient(135deg, rgba(26, 188, 156, 0.05) 0%, rgba(0, 217, 255, 0.05) 100%);
+      padding: 1.5rem;
+      border-radius: 10px;
+      border-left: 3px solid var(--success);
+      margin-bottom: 1rem;
+      min-height: 150px;
+      line-height: 1.8;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .output-controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-copy,
+    .btn-download,
+    .btn-share {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    /* ===== Stats Section ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat-box {
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 140, 66, 0.1) 100%);
+      padding: 1rem;
+      border-radius: 10px;
+      border-left: 3px solid var(--primary);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      margin-top: 0.25rem;
+    }
+
+    /* ===== Empty State ===== */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #7f8c8d;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* ===== Error Alert ===== */
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+      border-left: 4px solid;
+    }
+
+    .alert-error {
+      background: #fadbd8;
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .alert-success {
+      background: #d4edda;
+      border-color: var(--success);
+      color: #155724;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      border-color: #0c5460;
+      color: #0c5460;
+    }
+
+    .alert-close {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .form-section {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-features {
+        grid-template-columns: 1fr;
+      }
+
+      .header-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .header-info {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+      }
+    }
+
+    /* ===== Loading Animation ===== */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .loading-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .loading-spinner-large {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 107, 53, 0.3);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <span class="logo-icon">✨</span>
+        <span>GenSpark AI</span>
+      </div>
+      <div class="header-info">
+        <span style="font-size: 0.9rem;">E-Commerce Product Description Generator</span>
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span>Live</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>🚀 Create SEO-Optimized Product Descriptions</h1>
+        <p>Powered by GenAI - Generate high-converting e-commerce copy in seconds</p>
+        <div class="hero-features">
+          <div class="feature-item">⚡ AI-Powered</div>
+          <div class="feature-item">📱 Mobile Ready</div>
+          <div class="feature-item">🎯 SEO-Optimized</div>
+          <div class="feature-item">💡 Smart Analysis</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Form Section -->
+    <div class="form-section">
+      <!-- Product Details Form -->
+      <div class="form-card">
+        <h2 style="color: var(--secondary); margin-bottom: 1.5rem;">📦 Product Details</h2>
+        
+        <div class="form-group">
+          <label for="productName" class="required">Product Name</label>
+          <input type="text" id="productName" placeholder="e.g., Premium Wireless Headphones" required>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="">Select a category...</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Home & Garden">Home & Garden</option>
+            <option value="Sports">Sports & Outdoors</option>
+            <option value="Beauty">Beauty & Personal Care</option>
+            <option value="Food & Beverage">Food & Beverage</option>
+            <option value="Toys">Toys & Games</option>
+            <option value="Books">Books & Media</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="keyFeatures" class="required">Key Features</label>
+          <textarea id="keyFeatures" placeholder="List main features and benefits (e.g., Noise-cancelling, 30-hour battery life, Bluetooth 5.0)" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="targetAudience">Target Audience</label>
+          <input type="text" id="targetAudience" placeholder="e.g., Tech-savvy professionals, music enthusiasts">
+        </div>
+
+        <div class="form-group">
+          <label for="tone">Tone & Style</label>
+          <select id="tone">
+            <option value="professional">Professional</option>
+            <option value="friendly">Friendly & Casual</option>
+            <option value="luxury">Luxury & Premium</option>
+            <option value="playful">Playful & Fun</option>
+            <option value="technical">Technical & Detailed</option>
+            <option value="minimalist">Minimalist & Simple</option>
+            <option value="inspirational">Inspirational</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Image Upload Section -->
+      <div class="image-upload-card">
+        <h2 style="color: var(--secondary); margin-bottom: 1.5rem;">📸 Product Image</h2>
+        
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-text">Drag & drop your product image</div>
+          <div class="upload-hint">or click to browse · JPG, PNG, WebP up to 5MB</div>
+          <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <img id="imagePreview">
+        <div id="imageInfo" class="image-info"></div>
+
+        <div class="button-group" style="margin-top: 1rem;">
+          <button class="btn-secondary" id="removeImageBtn" style="display: none;">Remove Image</button>
+          <button class="btn-clear" id="clearFormBtn">Clear All</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generate Button -->
+    <div style="text-align: center; margin: 2rem 0;">
+      <button class="btn-primary" id="generateBtn" style="padding: 1.25rem 3rem; font-size: 1.1rem; margin: 0 auto;">
+        <span>✨ Generate with GenAI</span>
+      </button>
+    </div>
+
+    <!-- Output Section -->
+    <div class="output-section">
+      <div class="output-header">
+        <span class="output-icon">📝</span>
+        <h2>AI-Generated Product Description</h2>
+      </div>
+
+      <div id="outputContent" class="empty-state">
+        <div class="empty-icon">📋</div>
+        <p>Fill in your product details and click "Generate with GenAI" to create a polished, SEO-optimized description.</p>
+      </div>
+
+      <div class="output-controls" id="outputControls" style="display: none;">
+        <button class="btn-copy btn-primary">📋 Copy to Clipboard</button>
+        <button class="btn-download btn-secondary">⬇️ Download as TXT</button>
+        <button class="btn-share btn-secondary">📤 Share</button>
+      </div>
+
+      <div class="stats-grid" id="statsGrid" style="display: none;">
+        <div class="stat-box">
+          <div class="stat-value" id="wordCount">0</div>
+          <div class="stat-label">Word Count</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="charCount">0</div>
+          <div class="stat-label">Character Count</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="readingTime">0s</div>
+          <div class="stat-label">Reading Time</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+      <div class="loading-spinner-large"></div>
+      <p style="color: var(--text); margin: 0;">Generating your description...</p>
+      <p style="color: #7f8c8d; font-size: 0.9rem; margin-top: 0.5rem;">This usually takes 5-10 seconds</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    class ProductDescriptionGenerator {
+      constructor() {
+        this.formData = {};
+        this.imageFile = null;
+        this.init();
+      }
+
+      init() {
+        this.setupEventListeners();
+        this.loadSavedData();
+      }
+
+      setupEventListeners() {
+        // Form inputs
+        document.getElementById('productName').addEventListener('input', (e) => {
+          this.formData.productName = e.target.value;
+          this.saveData();
+        });
+
+        document.getElementById('category').addEventListener('change', (e) => {
+          this.formData.category = e.target.value;
+          this.saveData();
+        });
+
+        document.getElementById('keyFeatures').addEventListener('input', (e) => {
+          this.formData.keyFeatures = e.target.value;
+          this.saveData();
+        });
+
+        document.getElementById('targetAudience').addEventListener('input', (e) => {
+          this.formData.targetAudience = e.target.value;
+          this.saveData();
+        });
+
+        document.getElementById('tone').addEventListener('change', (e) => {
+          this.formData.tone = e.target.value;
+          this.saveData();
+        });
+
+        // Image upload
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+
+        uploadArea.addEventListener('click', () => imageInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+          uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove('dragover');
+          const files = e.dataTransfer.files;
+          if (files.length) this.handleImageSelect(files[0]);
+        });
+
+        imageInput.addEventListener('change', (e) => {
+          if (e.target.files.length) this.handleImageSelect(e.target.files[0]);
+        });
+
+        // Buttons
+        document.getElementById('generateBtn').addEventListener('click', () => this.generateDescription());
+        document.getElementById('clearFormBtn').addEventListener('click', () => this.clearForm());
+        document.getElementById('removeImageBtn').addEventListener('click', () => this.removeImage());
+
+        // Output controls
+        document.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-copy')) this.copyToClipboard();
+          if (e.target.closest('.btn-download')) this.downloadAsText();
+          if (e.target.closest('.btn-share')) this.shareDescription();
+        });
+      }
+
+      handleImageSelect(file) {
+        const maxSize = parseInt(process.env.MAX_IMAGE_SIZE || 5242880);
+        
+        if (file.size > maxSize) {
+          this.showAlert('Image size exceeds 5MB limit', 'error');
+          return;
+        }
+
+        this.imageFile = file;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = document.getElementById('imagePreview');
+          img.src = e.target.result;
+          img.style.display = 'block';
+
+          const uploadArea = document.getElementById('uploadArea');
+          uploadArea.style.display = 'none';
+
+          document.getElementById('removeImageBtn').style.display = 'block';
+
+          // Show image info
+          const info = document.getElementById('imageInfo');
+          info.innerHTML = `
+            <strong>✓ Image uploaded</strong><br>
+            Name: ${file.name}<br>
+            Size: ${(file.size / 1024).toFixed(2)} KB<br>
+            Type: ${file.type}
+          `;
+          info.style.display = 'block';
+        };
+
+        reader.readAsDataURL(file);
+      }
+
+      removeImage() {
+        this.imageFile = null;
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('imageInfo').style.display = 'none';
+        document.getElementById('imageInput').value = '';
+        document.getElementById('uploadArea').style.display = 'block';
+        document.getElementById('removeImageBtn').style.display = 'none';
+      }
+
+      async generateDescription() {
+        // Validate form
+        const productName = document.getElementById('productName').value.trim();
+        const keyFeatures = document.getElementById('keyFeatures').value.trim();
+
+        if (!productName) {
+          this.showAlert('Please enter a product name', 'error');
+          return;
+        }
+
+        if (!keyFeatures) {
+          this.showAlert('Please enter key features', 'error');
+          return;
+        }
+
+        // Show loading
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        document.getElementById('generateBtn').disabled = true;
+
+        try {
+          const formData = new FormData();
+          formData.append('productName', productName);
+          formData.append('category', document.getElementById('category').value);
+          formData.append('keyFeatures', keyFeatures);
+          formData.append('targetAudience', document.getElementById('targetAudience').value);
+          formData.append('tone', document.getElementById('tone').value);
+
+          if (this.imageFile) {
+            formData.append('image', this.imageFile);
+          }
+
+          const response = await fetch('/api/generate-description', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await response.json();
+
+          if (!data.success) {
+            this.showAlert(data.error || 'Failed to generate description', 'error');
+            return;
+          }
+
+          this.displayDescription(data.description);
+          this.showAlert('Description generated successfully!', 'success');
+        } catch (error) {
+          this.showAlert('Error: ' + error.message, 'error');
+        } finally {
+          document.getElementById('loadingOverlay').style.display = 'none';
+          document.getElementById('generateBtn').disabled = false;
+        }
+      }
+
+      displayDescription(description) {
+        const outputContent = document.getElementById('outputContent');
+        outputContent.innerHTML = description;
+        outputContent.classList.remove('empty-state');
+
+        document.getElementById('outputControls').style.display = 'flex';
+
+        // Update stats
+        const words = description.trim().split(/\s+/).length;
+        const chars = description.length;
+        const readTime = Math.ceil(words / 200);
+
+        document.getElementById('wordCount').textContent = words;
+        document.getElementById('charCount').textContent = chars;
+        document.getElementById('readingTime').textContent = readTime + 's';
+
+        document.getElementById('statsGrid').style.display = 'grid';
+
+        // Scroll to output
+        setTimeout(() => {
+          document.querySelector('.output-section').scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+
+      copyToClipboard() {
+        const text = document.getElementById('outputContent').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+          this.showAlert('Description copied to clipboard!', 'success');
+        }).catch(() => {
+          this.showAlert('Failed to copy to clipboard', 'error');
+        });
+      }
+
+      downloadAsText() {
+        const text = document.getElementById('outputContent').innerText;
+        const productName = document.getElementById('productName').value || 'product';
+        const filename = `${productName}-description-${Date.now()}.txt`;
+
+        const link = document.createElement('a');
+        link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+        link.download = filename;
+        link.click();
+
+        this.showAlert('Description downloaded!', 'success');
+      }
+
+      shareDescription() {
+        const text = document.getElementById('outputContent').innerText;
+        const productName = document.getElementById('productName').value;
+
+        if (navigator.share) {
+          navigator.share({
+            title: `${productName} - Product Description`,
+            text: text
+          }).catch(() => {});
+        } else {
+          this.copyToClipboard();
+          this.showAlert('Share link copied to clipboard!', 'success');
+        }
+      }
+
+      clearForm() {
+        document.getElementById('productName').value = '';
+        document.getElementById('category').value = '';
+        document.getElementById('keyFeatures').value = '';
+        document.getElementById('targetAudience').value = '';
+        document.getElementById('tone').value = 'professional';
+
+        this.removeImage();
+        this.formData = {};
+        localStorage.removeItem('generatorData');
+
+        this.showAlert('Form cleared!', 'info');
+      }
+
+      showAlert(message, type = 'info') {
+        const container = document.getElementById('alertContainer');
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.innerHTML = `
+          ${message}
+          <span class="alert-close" onclick="this.parentElement.remove()">×</span>
+        `;
+        container.appendChild(alert);
+        alert.style.display = 'block';
+
+        setTimeout(() => alert.remove(), 5000);
+      }
+
+      saveData() {
+        localStorage.setItem('generatorData', JSON.stringify(this.formData));
+      }
+
+      loadSavedData() {
+        const saved = localStorage.getItem('generatorData');
+        if (saved) {
+          this.formData = JSON.parse(saved);
+          document.getElementById('productName').value = this.formData.productName || '';
+          document.getElementById('category').value = this.formData.category || '';
+          document.getElementById('keyFeatures').value = this.formData.keyFeatures || '';
+          document.getElementById('targetAudience').value = this.formData.targetAudience || '';
+          document.getElementById('tone').value = this.formData.tone || 'professional';
+        }
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      new ProductDescriptionGenerator();
+    });
+  </script>
+</body>
+</html>
